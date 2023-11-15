@@ -3,6 +3,9 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 function Home() {
   const [data, setData] = useState([{}]);
+  // const [data, setData] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(3);
   const token = sessionStorage.getItem('token');
   useEffect(() => {
     loadUsers();
@@ -27,6 +30,9 @@ function Home() {
     }
   };
 
+
+ // Change page
+ const paginate = (pageNumber) => setCurrentPage(pageNumber);
   const deleteUser = async id => {
     try {
       const res = await axios.delete(`https://reqres.in/api/users/${id}`, {
@@ -34,7 +40,7 @@ function Home() {
           Authorization: 'Bearer ' + token
         }
       });
-      
+
       if (res.status == 204) {
         for (var i = 0; i < data.length; i++) {
           if (data[i].id == id) {
@@ -54,6 +60,10 @@ function Home() {
       alert(e.message);
     }
   };
+   // Calculate pagination
+ const indexOfLastItem = currentPage * itemsPerPage;
+ const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+ const currentItems = data.slice(indexOfFirstItem, indexOfLastItem);
   return (
     <div className="container">
       <div className="py-4">
@@ -67,7 +77,7 @@ function Home() {
             </tr>
           </thead>
           <tbody>
-            {data?.map((user) => (
+            {currentItems?.map((user) => (
               <tr>
                 <td><img src={user.avatar} alt={user.avatar}></img></td>
                 <td className="align-middle">{user.first_name + " " + user.last_name}</td>
@@ -95,6 +105,13 @@ function Home() {
             ))}
           </tbody>
         </table>
+        <div>
+        {Array.from({ length: Math.ceil(data.length / itemsPerPage) }).map((_, index) => (
+          <button key={index} onClick={() => paginate(index + 1)}>
+            {index + 1}
+          </button>
+        ))}
+      </div>
       </div>
     </div>
   );
