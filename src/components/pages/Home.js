@@ -34,6 +34,7 @@ function Home() {
           Authorization: 'Bearer ' + token
         }
       });
+      
       if (res.status == 204) {
         for (var i = 0; i < data.length; i++) {
           if (data[i].id == id) {
